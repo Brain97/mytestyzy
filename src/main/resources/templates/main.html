@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <nav class="navbar navbar-inverse" role="navigation">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button> <a class="navbar-brand" href="/main">welcome</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" >
+                    <ul class="nav navbar-nav">
+                        <li class="active">
+                            <a href="#" data-toggle="modal" data-target="#inputdata">导入数据</a>
+                        </li>
+
+
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#outputdata">导出数据</a>
+                        </li>
+                        <li>
+                            <a href="#">查询</a>
+                        </li>
+                        <li>
+                            <a href="#">分析</a>
+                        </li>
+
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user">${user.name}<strong class="caret"></strong></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="/logout">注销</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+            </nav>
+
+            <!-- 进度显示 -->
+            <div class="jumbotron">
+
+                <p>
+                    <a>导入路径</a>
+                    ${input_path!}<br>
+                    <progress id="input_progress" value="0" max="100"/>
+
+                </p>
+            </div>
+
+            <!--input（Modal） -->
+            <div class="modal fade" id="inputdata" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                               导入数据
+                            </h4>
+                        </div>
+                        <form action="/upload" method="post">
+                            <div class="modal-body">
+                                <input type="file" id="file">
+                                <input type="text" name="upload_path" id="upload_path" placeholder="路径自动填充">
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                </button>
+                                <button style="submit"  class="btn btn-primary">
+                                    确定
+                                </button>
+                            </div>
+                        </form>
+
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </div>
+
+                <!-- ouput（Modal） -->
+                <div class="modal fade" id="outputdata" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+
+
+
+
+                                <label>选择导出表</label>
+                                <select  class="form-control" >
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                </select>
+
+
+
+
+
+
+                            </div>
+                            <div class="modal-body">
+                                在这里添加一些文本
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                </button>
+                                <button type="button" class="btn btn-primary">
+                                    提交更改
+                                </button>
+
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal -->
+                </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $('#file').change(function(){
+        document.getElementById("upload_path").value=$('#file').val();
+    });
+
+    $(document).ready(function(){
+        getStatus();
+    });
+
+    var testFileTimer;
+    function getStatus(){
+        clearInterval(testFileTimer);
+        loadProcess();
+        testFileTimer = setInterval(function(){
+            loadProcess();
+        },1000)
+    }
+    function loadProcess(){
+        $.ajax({
+            type: 'post',
+            url: "/ajax",
+            success: function(data){
+                switch(data.stage){
+                    case '1' :
+                        document.getElementsByTagName("progress")[0].value= data.up_num;
+                        break;
+                    case '2' :
+                        document.getElementsByTagName("progress")[0].value=0;
+                        clearInterval(testFileTimer);
+                        break;
+                }
+            }
+        })
+    }
+
+
+
+
+</script>
+
+</html>
